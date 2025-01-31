@@ -69,17 +69,20 @@ class App {
         // -- <form> --
         const elForm = document.createElement( 'form' );
         elForm.noValidate = true;
+        elForm.addEventListener( 'submit', this.handlerAddNewPostit.bind( this ) );
 
         // -- <input> --
         this.elInputNewPiTitle = document.createElement( 'input' );
         this.elInputNewPiTitle.type = 'text';
         this.elInputNewPiTitle.placeholder = 'Titre';
         this.elInputNewPiTitle.addEventListener( 'focus', this.handlerRemoveError.bind( this ) );
+        this.elInputNewPiTitle.addEventListener( 'input', this.handlerRemoveError.bind( this ) );
 
         // -- <textarea> --
         this.elTextareaNewPiContent = document.createElement( 'textarea' );
         this.elTextareaNewPiContent.placeholder = 'Contenu';
         this.elTextareaNewPiContent.addEventListener( 'focus', this.handlerRemoveError.bind( this ) );
+        this.elTextareaNewPiContent.addEventListener( 'input', this.handlerRemoveError.bind( this ) );
 
         // -- <button> --
         const elBtnNewPiAdd = document.createElement( 'button' );
@@ -141,6 +144,9 @@ class App {
      * @param {Event} evt Evénement produit intercepté par l'écouteur
      */
     handlerAddNewPostit( evt ) {
+        // Empêcher le comportement par défaut du formulaire
+        evt.preventDefault();
+
         // Récupération des valeurs des champs du formulaire
         let newTitle = this.elInputNewPiTitle.value;
         let newContent = this.elTextareaNewPiContent.value;
