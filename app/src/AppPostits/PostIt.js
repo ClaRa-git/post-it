@@ -91,6 +91,19 @@ export class PostIt {
         return elLi;
     }
 
+    commandEdit() {
+        console.log( 'edit' );
+    }
+    commandSave() {
+        console.log( 'save' );
+    }
+    commandCancel() {
+        console.log( 'cancel' );
+    }
+    commandDelete() {
+        console.log( 'delete' );
+    }
+
     /**
      * Donne la forme que doit avoir le post-it en littéral (utilisé par JSON.stringify())
      * @returns Forme littérale du PostIt
@@ -109,6 +122,25 @@ export class PostIt {
      * @param {Event} evt
     */
     handlerButtons( evt ) {
-        console.log(evt);
+        const elTarget = evt.target;
+        const role = elTarget.dataset.role;
+
+        switch( role ) {
+            case 'edit':
+                this.commandEdit();
+                break;
+            case 'save':
+                this.commandSave();
+                break;
+            case 'cancel':
+                this.commandCancel();
+                break;
+            case 'delete':
+                this.commandDelete();
+                break; 
+            default:
+                console.log( elTarget );
+                break;
+        }
     }
 }
