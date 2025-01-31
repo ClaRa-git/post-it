@@ -74,10 +74,12 @@ class App {
         this.elInputNewPiTitle = document.createElement( 'input' );
         this.elInputNewPiTitle.type = 'text';
         this.elInputNewPiTitle.placeholder = 'Titre';
+        this.elInputNewPiTitle.addEventListener( 'focus', this.handlerRemoveError.bind( this ) );
 
         // -- <textarea> --
         this.elTextareaNewPiContent = document.createElement( 'textarea' );
         this.elTextareaNewPiContent.placeholder = 'Contenu';
+        this.elTextareaNewPiContent.addEventListener( 'focus', this.handlerRemoveError.bind( this ) );
 
         // -- <button> --
         const elBtnNewPiAdd = document.createElement( 'button' );
@@ -125,9 +127,13 @@ class App {
      * Effectue le rendu de la liste des post-its
      */
     renderList() {
-        // TODO: Le code
         // 1- Vidange du ol de la liste
+        this.elOlPiList.innerHTML = '';
+
         // 2- Reconstruction du contenu de la liste à partir du tableau arrPostIt
+        for( let postit of this.arrPostIt ) {
+            this.elOlPiList.append( postit.getDOM() );
+        }
     }
 
     /**
@@ -135,15 +141,62 @@ class App {
      * @param {Event} evt Evénement produit intercepté par l'écouteur
      */
     handlerAddNewPostit( evt ) {
+        // Récupération des valeurs des champs du formulaire
+        let newTitle = this.elInputNewPiTitle.value;
+        let newContent = this.elTextareaNewPiContent.value;
+        let now = Date.now();
+
+        // Vérication de la saisie
+        // Flag pour vérifier si une erreur est survenue
+        let hasError = false;
+        // Vérication de la validité des valeurs
+        const regExpNotEmpty = new RegExp( /\S/ ); // autre chose que des espaces ou vide
+        // Si le titre est vide ou ne contient que des espaces
+        if( !regExpNotEmpty.test( newTitle )){
+            hasError = true;
+            this.elInputNewPiTitle.value = '';
+            this.elInputNewPiTitle.classList.add( 'error' );
+        }
+
+        // Si le contenu est vide ou ne contient que des espaces
+        if( !regExpNotEmpty.test( newContent )){
+            hasError = true;
+            this.elTextareaNewPiContent.value = '';
+            this.elTextareaNewPiContent.classList.add( 'error' );
+        }
+
+        // Si le contenu est vide ou ne contient que des espaces
+        if( hasError ) return;
 
         // 1- Création d'une version litérale de l'objet PostIt avec l'objet du formulaire
-        // 2- Création d'une instance de la class PostIt avec l'objet litéral
-        // 3- Ajout de l'instance au début du tableau arrPostIt
+        const newPostItLiteral = {
+            title: newTitle,
+            content: newContent,
+            dateCreate: now,
+            dateUpdate: now
+        };
 
+        // 2- Création d'une instance de la class PostIt avec l'objet litéral
+        const newPostIt = new PostIt( newPostItLiteral );
+
+        // 3- Ajout de l'instance au début du tableau arrPostIt
+        this.arrPostIt.unshift( newPostIt );
 
         // 4- Vidange du ol de la liste
         // 5- Reconstruction du contenu de la liste
         this.renderList();
+
+        // 6- Effacer les champs du formulaire
+        this.elInputNewPiTitle.value = ''; 
+        this.elTextareaNewPiContent.value = '';
+    }
+
+    /**
+     * Gestionnaire de suppression de la classe "error" sur les champs du formulaire
+     * @param {Event} evt Evénement produit intercepté par l'écouteur
+     */
+    handlerRemoveError( evt ) {
+        evt.target.classList.remove( 'error' );
     }
 
     /**
