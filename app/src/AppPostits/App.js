@@ -127,6 +127,7 @@ class App {
     renderList() {
         // TODO: Le code
         // 1- Vidange du ol de la liste
+        // 2- Reconstruction du contenu de la liste à partir du tableau arrPostIt
     }
 
     /**
