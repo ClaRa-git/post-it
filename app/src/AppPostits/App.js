@@ -3,6 +3,9 @@
 // Import de la feuille de style
 import "../assets/css/style.css";
 
+// Import de la class PostIt
+import { PostIt } from "./PostIt";
+
 // La class n'est pas exportée, ce qui empêche de l'importer et de l'instancier
 // C'est l'équivalent d'un constructeur privé en PHP
 class App {
@@ -10,6 +13,7 @@ class App {
     elInputNewPiTitle;
     elTextareaNewPiContent;
     elOlPiList;
+    arrPostIt = [];
 
     /**
      * Démarrage de l'application
@@ -19,6 +23,16 @@ class App {
 
         // Appel de la méthode pour effectuer le rendu de l'UI de base
         this.renderBaseUI();
+
+        // TEST
+        const pTest = new PostIt( {
+            title: 'Toto à la plage',
+            content: 'Il nage le crawl au milieu des requins',
+            dateCreate: 1666180099794,
+            dateUpdate: 1666181000000
+        } );
+
+        this.elOlPiList.append( pTest.getDOM() );
     }
     
     /**
@@ -93,6 +107,13 @@ class App {
         // -- <main> --
         const elMain = document.createElement( 'main' );
 
+        // -- <ol> --
+        this.elOlPiList = document.createElement( 'ol' );
+        this.elOlPiList.id = 'nota-list';
+
+        // -- Injection <ol> dans <main> --
+        elMain.append( this.elOlPiList );
+
 
         // TODO: L'intérieur
 
@@ -101,11 +122,27 @@ class App {
     }
 
     /**
+     * Effectue le rendu de la liste des post-its
+     */
+    renderList() {
+        // TODO: Le code
+        // 1- Vidange du ol de la liste
+    }
+
+    /**
      * Gestionnaire de l'événement click sur le bouton "Ajouter un post-it"
      * @param {Event} evt Evénement produit intercepté par l'écouteur
      */
     handlerAddNewPostit( evt ) {
-        // TODO: le code
+
+        // 1- Création d'une version litérale de l'objet PostIt avec l'objet du formulaire
+        // 2- Création d'une instance de la class PostIt avec l'objet litéral
+        // 3- Ajout de l'instance au début du tableau arrPostIt
+
+
+        // 4- Vidange du ol de la liste
+        // 5- Reconstruction du contenu de la liste
+        this.renderList();
     }
 
     /**
