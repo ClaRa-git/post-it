@@ -204,7 +204,11 @@ class App {
      * @param {Event} evt Evénement produit intercepté par l'écouteur
      */
     handlerClear( evt ) {
-        // TODO: le code
+        // 1 - Vidange du tableau arrPostIt
+        this.arrPostIt = [];
+
+        // 2 - Regénération de la liste
+        this.renderList();
     }
 }
 
