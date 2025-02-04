@@ -18,6 +18,9 @@ export class PostIt {
     dateCreate;
     dateUpdate;
     eventDetail;
+    container = null;
+    containerTitle = null;
+    containerContent = null;
 
     constructor( postItLiteral ) {
         this.title = postItLiteral.title;
@@ -30,10 +33,16 @@ export class PostIt {
     }
 
     /**
-     * Crée un élément DOM représentant le post-it
+     * Créer et stocker un élément DOM représentant le post-it
      * @returns {HTMLElement} 
      */
     getDOM() {
+        // S'il a déjà été créé, on le retourne
+        if ( this.container != null ) {
+            return this.container;
+        } 
+
+        // Sinon, on crée le dom
         /* 
         Template :
         <li>
@@ -58,9 +67,9 @@ export class PostIt {
         </li>
         */
 
-        const elLi = document.createElement( 'li' );
-        elLi.classList.add( 'nota' );
-        elLi.dataset.mode = MODE_VIEW;
+        this.container = document.createElement( 'li' );
+        this.container.classList.add( 'nota' );
+        this.container.dataset.mode = MODE_VIEW;
 
         // Dates formatées
         let dateCreate = new Date( this.dateCreate ).toLocaleString();
@@ -83,27 +92,55 @@ export class PostIt {
         innerDom +=         '</div>';
         innerDom +=     '</div>';
         innerDom += '</div>';
-        innerDom += `<div class="nota-title">${this.title}</div>`;
-        innerDom += `<div class="nota-content">${this.content}</div>`;
 
         // On injecte le contenu dans le li
-        elLi.innerHTML = innerDom;
+        this.container.innerHTML = innerDom;
+        
+        this.containerTitle = document.createElement( 'div' );
+        this.containerTitle.classList.add( 'nota-title' );
+        this.containerTitle.textContent = this.title;
+
+        this.containerContent = document.createElement( 'div' );
+        this.containerContent.classList.add( 'nota-content' );
+        this.containerContent.textContent = this.content;
+
+        this.container.append( this.containerTitle, this.containerContent );
 
         // Ecouteurs d'événements sur les boutons
-        elLi.addEventListener( 'click', this.handlerButtons.bind( this ) );
+        this.container.addEventListener( 'click', this.handlerButtons.bind( this ) );
 
-        return elLi;
+        return this.container;
+    }
+
+    /**
+     * Passe le post-it en mode édition
+     */
+    setEditMode() {
+        this.container.dataset.mode = MODE_EDIT;
+        this.containerTitle.contentEditable = true;
+        this.containerContent.contentEditable = true;
+    }
+
+    /**
+     * Passe le post-it en mode vue
+     */
+    setViewMode() {
+        this.container.dataset.mode = MODE_VIEW;
+        this.containerTitle.contentEditable = false;
+        this.containerContent.contentEditable = false;
     }
 
     commandEdit() {
-        console.log( 'edit' );
+        const editEvent = new CustomEvent( 'pi.edit', this.eventDetail );
+        document.dispatchEvent( editEvent );
     }
     commandSave() {
         const saveEvent = new CustomEvent( 'pi.save', this.eventDetail );
         document.dispatchEvent( saveEvent );
     }
     commandCancel() {
-        console.log( 'cancel' );
+        const cancelEvent = new CustomEvent( 'pi.cancel', this.eventDetail );
+        document.dispatchEvent( cancelEvent );
     }
     commandDelete() {
         const deleteEvent = new CustomEvent( 'pi.delete', this.eventDetail );
@@ -145,7 +182,6 @@ export class PostIt {
                 this.commandDelete();
                 break; 
             default:
-                console.log( elTarget );
                 break;
         }
     }

@@ -14,6 +14,7 @@ class App {
     elTextareaNewPiContent;
     elOlPiList;
     arrPostIt = [];
+    backUpPostItData = null;
 
     /**
      * Démarrage de l'application
@@ -37,6 +38,12 @@ class App {
 
         // Enregistrement
         document.addEventListener( 'pi.save', this.handlerOnPiSave.bind( this ) );
+
+        // Annulation
+        document.addEventListener( 'pi.cancel', this.handlerOnPiCancel.bind( this ) );
+
+        // Edition
+        document.addEventListener( 'pi.edit', this.handlerOnPiEdit.bind( this ) );
     }
     
     /**
@@ -122,9 +129,6 @@ class App {
 
         // -- Injection <ol> dans <main> --
         elMain.append( this.elOlPiList );
-
-
-        // TODO: L'intérieur
 
         // -- Injection <header> + <main> dans le <body> --
         document.body.append( elHeader, elMain );
@@ -226,6 +230,11 @@ class App {
      * @param {Event} evt Evénement produit intercepté par l'écouteur
      */
     handlerOnPiDelete( evt ) {
+
+        if( this.backUpPostItData !== null ) {
+            return;
+        }
+
         const postIt = evt.detail.emitter;
         // On ne garde que les post-its qui ne sont pas égaux à celui qui a émis l'événement
         this.arrPostIt = this.arrPostIt.filter( pi => !Object.is( pi, postIt ) );
@@ -237,6 +246,47 @@ class App {
      * @param {Event} evt Evénement produit intercepté par l'écouteur
      */
     handlerOnPiSave( evt ) {
+        const postIt = evt.detail.emitter;
+    }
+
+    /**
+     * Gestionnaire de l'événement click sur le bouton "Annuler un post-it"
+     * @param {Event} evt Evénement produit intercepté par l'écouteur
+     */
+    handlerOnPiCancel( evt ) {
+        const postIt = evt.detail.emitter;
+
+        // Passage en mode vue
+        postIt.setViewMode();
+
+        // On remet les données sauvegardées dans le post-it
+        postIt.containerTitle.textContent = this.backUpPostItData.title;
+        postIt.containerContent.textContent = this.backUpPostItData.content;
+
+        // On remet à null les données sauvegardées
+        this.backUpPostItData = null;
+    }
+
+    /**
+     * Gestionnaire de l'événement click sur le bouton "Editer un post-it"
+     * @param {Event} evt Evénement produit intercepté par l'écouteur
+     */
+    handlerOnPiEdit( evt ) {
+
+        // Si une édition est déjà en cours, on ne fait rien
+        if( this.backUpPostItData !== null ) {
+            return;
+        }
+
+        const postIt = evt.detail.emitter;
+
+        // Sauvegarde des données du post-it en cas d'annulation
+        this.backUpPostItData = postIt.toJSON();
+
+        // Passage en mode édition
+        postIt.setEditMode();
+
+        
     }
 }
 
