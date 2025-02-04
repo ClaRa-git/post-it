@@ -247,6 +247,25 @@ class App {
      */
     handlerOnPiSave( evt ) {
         const postIt = evt.detail.emitter;
+
+        postIt.setViewMode();
+
+        // On remet à null les données sauvegardées
+        this.backUpPostItData = null;
+
+        // On met à jour les données du post-it à partir de celles du formulaire
+        postIt.title = postIt.containerTitle.textContent;
+        postIt.content = postIt.containerContent.textContent;
+
+        // On met à jour la date de modification
+        postIt.dateUpdate = Date.now();
+        postIt.containerDateUpdate.textContent = new Date( postIt.dateUpdate ).toLocaleString();
+
+        // On retrie le tableau par date de modification (la plus récente en premier)
+        this.arrPostIt.sort( ( a, b ) => b.dateUpdate - a.dateUpdate );
+
+        // On regénère la liste
+        this.renderList();        
     }
 
     /**
