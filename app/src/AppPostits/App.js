@@ -5,6 +5,7 @@ import "../assets/css/style.css";
 
 // Import de la class PostIt
 import { PostIt } from "./PostIt";
+import { PostItService } from "./Services/PostItService";
 
 // La class n'est pas exportée, ce qui empêche de l'importer et de l'instancier
 // C'est l'équivalent d'un constructeur privé en PHP
@@ -16,10 +17,17 @@ class App {
     arrPostIt = [];
     backUpPostItData = null;
 
+    dataService;
+
+    constructor( service ) {
+        this.dataService = service;
+    }
+
     /**
      * Démarrage de l'application
      */
     start() {
+
         console.log("Démarrage de l'application");
 
         // Appel de la méthode pour effectuer le rendu de l'UI de base
@@ -27,6 +35,12 @@ class App {
 
         // Pose des écouteurs d'événements
         this.initPostItListeners();
+
+        // Récupération des données
+        this.arrPostIt = this.dataService.getAll();
+
+        // Appel de la méthode pour effectuer le rendu de la liste des post-its
+        this.renderList();
     }
 
     /**
@@ -196,6 +210,8 @@ class App {
         // 3- Ajout de l'instance au début du tableau arrPostIt
         this.arrPostIt.unshift( newPostIt );
 
+        this.dataService.saveAll(this.arrPostIt);
+
         // 4- Vidange du ol de la liste
         // 5- Reconstruction du contenu de la liste
         this.renderList();
@@ -221,6 +237,8 @@ class App {
         // 1 - Vidange du tableau arrPostIt
         this.arrPostIt = [];
 
+        this.dataService.saveAll(this.arrPostIt);
+
         // 2 - Regénération de la liste
         this.renderList();
     }
@@ -238,6 +256,9 @@ class App {
         const postIt = evt.detail.emitter;
         // On ne garde que les post-its qui ne sont pas égaux à celui qui a émis l'événement
         this.arrPostIt = this.arrPostIt.filter( pi => !Object.is( pi, postIt ) );
+
+        this.dataService.saveAll(this.arrPostIt);
+
         this.renderList();
     }
 
@@ -263,6 +284,8 @@ class App {
 
         // On retrie le tableau par date de modification (la plus récente en premier)
         this.arrPostIt.sort( ( a, b ) => b.dateUpdate - a.dateUpdate );
+
+        this.dataService.saveAll(this.arrPostIt);
 
         // On regénère la liste
         this.renderList();        
@@ -309,9 +332,10 @@ class App {
     }
 }
 
+const dataService = new PostItService();
 // On crée une instance de la class App dans une variable
 // La variable est l'équivalent de la propriété statique "$instance" en PHP
-const app = new App();
+const app = new App( dataService );
 
 // On exporte cette variable.
 // Si à l'extérieur il y a plusieurs import de cette variable,
