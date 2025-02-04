@@ -17,12 +17,16 @@ export class PostIt {
     content;
     dateCreate;
     dateUpdate;
+    eventDetail;
 
     constructor( postItLiteral ) {
         this.title = postItLiteral.title;
         this.content = postItLiteral.content;
         this.dateCreate = postItLiteral.dateCreate;
         this.dateUpdate = postItLiteral.dateUpdate;
+
+        // Objet "detail" pour l'évènement personnalisé des actions sur le post-it
+        this.eventDetail = { detail: { emitter : this } };
     }
 
     /**
@@ -95,13 +99,15 @@ export class PostIt {
         console.log( 'edit' );
     }
     commandSave() {
-        console.log( 'save' );
+        const saveEvent = new CustomEvent( 'pi.save', this.eventDetail );
+        document.dispatchEvent( saveEvent );
     }
     commandCancel() {
         console.log( 'cancel' );
     }
     commandDelete() {
-        console.log( 'delete' );
+        const deleteEvent = new CustomEvent( 'pi.delete', this.eventDetail );
+        document.dispatchEvent( deleteEvent );
     }
 
     /**

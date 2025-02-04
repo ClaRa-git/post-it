@@ -24,15 +24,19 @@ class App {
         // Appel de la méthode pour effectuer le rendu de l'UI de base
         this.renderBaseUI();
 
-        // TEST
-        const pTest = new PostIt( {
-            title: 'Toto à la plage',
-            content: 'Il nage le crawl au milieu des requins',
-            dateCreate: 1666180099794,
-            dateUpdate: 1666181000000
-        } );
+        // Pose des écouteurs d'événements
+        this.initPostItListeners();
+    }
 
-        this.elOlPiList.append( pTest.getDOM() );
+    /**
+     * Initialisation des écouteurs d'événements émis par les post-its
+     */
+    initPostItListeners() {
+        // Suppression
+        document.addEventListener( 'pi.delete', this.handlerOnPiDelete.bind( this ) );
+
+        // Enregistrement
+        document.addEventListener( 'pi.save', this.handlerOnPiSave.bind( this ) );
     }
     
     /**
@@ -215,6 +219,24 @@ class App {
 
         // 2 - Regénération de la liste
         this.renderList();
+    }
+
+    /**
+     * Gestionnaire de l'événement click sur le bouton "Supprimer un post-it"
+     * @param {Event} evt Evénement produit intercepté par l'écouteur
+     */
+    handlerOnPiDelete( evt ) {
+        const postIt = evt.detail.emitter;
+        // On ne garde que les post-its qui ne sont pas égaux à celui qui a émis l'événement
+        this.arrPostIt = this.arrPostIt.filter( pi => !Object.is( pi, postIt ) );
+        this.renderList();
+    }
+
+    /**
+     * Gestionnaire de l'événement click sur le bouton "Enregistrer un post-it"
+     * @param {Event} evt Evénement produit intercepté par l'écouteur
+     */
+    handlerOnPiSave( evt ) {
     }
 }
 
